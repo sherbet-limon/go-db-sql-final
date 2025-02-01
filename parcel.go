@@ -17,7 +17,7 @@ func NewParcelStore(db *sql.DB) ParcelStore {
 
 func (s ParcelStore) Add(p Parcel) (int64, error) {
 	// реализуйте добавление строки в таблицу parcel, используйте данные из переменной p
-res, err := s.db.Exec("INSERT INTO parsel (Number, Client, Status, Address, CreatedAt) VALUES (:Number, :Client, :Status, :Address, :CreatedAt)",
+res, err := s.db.Exec("INSERT INTO parcel (Number, Client, Status, Address, CreatedAt) VALUES (:Number, :Client, :Status, :Address, :CreatedAt)",
 	sql.Named("Number", p.Number),
 	sql.Named("Client", p.Client),
 	sql.Named("Status", p.Status),
@@ -37,14 +37,23 @@ res, err := s.db.Exec("INSERT INTO parsel (Number, Client, Status, Address, Crea
 
 func (s ParcelStore) Get(number int) (Parcel, error) {
 	// реализуйте чтение строки по заданному number
-
 	// здесь из таблицы должна вернуться только одна строка
-
+	rows, err := s.db.Query("SELECT Number, Client, Status, Address, CreatedAt FROM parcel WHERE number = :number", 
+	sql.Named("number", number))
+    if err != nil {
+        return Parcel{}, err
+    }
+	defer rows.Close()
 	// заполните объект Parcel данными из таблицы
-	p := Parcel{}
-
-	return p, nil
-}
+	var p Parcel
+		for rows.Next() {
+        err := rows.Scan(&p.Number, &p.Client, &p.Status, &p.Address, &p.CreatedAt)
+        if err != nil {
+            return Parcel{}, err
+        }
+	}
+		return p, nil
+	}
 
 func (s ParcelStore) GetByClient(client int) ([]Parcel, error) {
 	// реализуйте чтение строк из таблицы parcel по заданному client
