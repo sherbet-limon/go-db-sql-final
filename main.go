@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
-
+	
 	_ "modernc.org/sqlite"
 )
 
@@ -19,7 +19,7 @@ type Parcel struct {
 	Client    int
 	Status    string
 	Address   string
-	CreatedAt string
+	Created_at string
 }
 
 type ParcelService struct {
@@ -35,7 +35,7 @@ func (s ParcelService) Register(client int, address string) (Parcel, error) {
 		Client:    client,
 		Status:    ParcelStatusRegistered,
 		Address:   address,
-		CreatedAt: time.Now().UTC().Format(time.RFC3339),
+		Created_at: time.Now().UTC().Format(time.RFC3339),
 	}
 
 	id, err := s.store.Add(parcel)
@@ -43,10 +43,10 @@ func (s ParcelService) Register(client int, address string) (Parcel, error) {
 		return parcel, err
 	}
 
-	parcel.Number = id
+	parcel.Number = int(id)
 
 	fmt.Printf("Новая посылка № %d на адрес %s от клиента с идентификатором %d зарегистрирована %s\n",
-		parcel.Number, parcel.Address, parcel.Client, parcel.CreatedAt)
+		parcel.Number, parcel.Address, parcel.Client, parcel.Created_at)
 
 	return parcel, nil
 }
@@ -60,7 +60,7 @@ func (s ParcelService) PrintClientParcels(client int) error {
 	fmt.Printf("Посылки клиента %d:\n", client)
 	for _, parcel := range parcels {
 		fmt.Printf("Посылка № %d на адрес %s от клиента с идентификатором %d зарегистрирована %s, статус %s\n",
-			parcel.Number, parcel.Address, parcel.Client, parcel.CreatedAt, parcel.Status)
+			parcel.Number, parcel.Address, parcel.Client, parcel.Created_at, parcel.Status)
 	}
 	fmt.Println()
 
@@ -98,8 +98,14 @@ func (s ParcelService) Delete(number int) error {
 
 func main() {
 	// настройте подключение к БД
+	db, err := sql.Open("sqlite", "tracker.db")
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+    defer db.Close()
 
-	store := // создайте объект ParcelStore функцией NewParcelStore
+	store := NewParcelStore(db)// создайте объект ParcelStore функцией NewParcelStore
 	service := NewParcelService(store)
 
 	// регистрация посылки
