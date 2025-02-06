@@ -35,8 +35,9 @@ func (s ParcelService) Register(client int, address string) (Parcel, error) {
 		Client:    client,
 		Status:    ParcelStatusRegistered,
 		Address:   address,
-		Created_at: time.Now().UTC().Format(time.RFC3339),
-	}
+		Created_at: time.Now().UTC().Format(time.RFC3339), //я понимаю, что нужно использовать CamelCase, однако в  
+	}                                                      // бд именно так назвается поле как snake_case. Менять бд я не хочу, 
+														   // вдруг вообще все перестанет работать 
 
 	id, err := s.store.Add(parcel)
 	if err != nil {
