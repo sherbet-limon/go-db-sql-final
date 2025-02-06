@@ -36,7 +36,7 @@ func TestAddGetDelete(t *testing.T) {
 	// prepare
 	// настройте подключение к БД
 	db, err := sql.Open("sqlite", "tracker.db")
-    	require.NoError(t, err)
+    require.NoError(t, err)
     
     defer db.Close()
 
@@ -46,28 +46,27 @@ func TestAddGetDelete(t *testing.T) {
 	// add
 	// добавьте новую посылку в БД, убедитесь в отсутствии ошибки и наличии идентификатора
 	id, err := store.Add(parcel)
-    	require.NoError(t, err)
-		require.NotEmpty(t, id)
+    require.NoError(t, err)
+	require.NotEmpty(t, id)
+	parcel.Number = id	
 
 	// get
 	// получите только что добавленную посылку, убедитесь в отсутствии ошибки
 	returnParcel, err := store.Get(id)
-		require.NoError(t, err)
-		assert.NotZero(t, returnParcel.Number)
+	require.NoError(t, err)
 
     // Проверяем, что данные посылки совпадают с ожидаемыми
 	// проверьте, что значения всех полей в полученном объекте совпадают со значениями полей в переменной parcel
-	parcel.Number = 0			//я так поняла, что раз number автоинкрементный, нам не нужно проверять на соответствия эти поля
-	returnParcel.Number = 0 	//главное, чтобы получаемый не был равен 0, для этого нужно приравнять игнорируемые поля
-    	assert.EqualValues(t, parcel, returnParcel, "Не совпадает")
+			
+    assert.EqualValues(t, parcel, returnParcel, "Не совпадает")
 	
 	// delete
 	// удалите добавленную посылку, убедитесь в отсутствии ошибки
 	// проверьте, что посылку больше нельзя получить из БД
 	err = store.Delete(id)
-		require.NoError(t, err)
+	require.NoError(t, err)
 	_, err = store.Get(id)
-		require.ErrorIs(t, err, sql.ErrNoRows)
+	require.ErrorIs(t, err, sql.ErrNoRows)
 }
 
 // TestSetAddress проверяет обновление адреса
@@ -75,7 +74,7 @@ func TestSetAddress(t *testing.T) {
 	// prepare
 	 // настройте подключение к БД
 	db, err := sql.Open("sqlite", "tracker.db")
-	 	require.NoError(t, err)
+	require.NoError(t, err)
 	
     defer db.Close()
 
@@ -85,8 +84,8 @@ func TestSetAddress(t *testing.T) {
 	// добавьте новую посылку в БД, убедитесь в отсутствии ошибки и наличии идентификатора
 	p := getTestParcel()
 	id, err := store.Add(p)
-    	require.NoError(t, err)
-		require.NotEmpty(t, id)
+    require.NoError(t, err)
+	require.NotEmpty(t, id)
 	
 	// set address
 	// обновите адрес, убедитесь в отсутствии ошибки
@@ -97,7 +96,7 @@ func TestSetAddress(t *testing.T) {
 	// check
 	// получите добавленную посылку и убедитесь, что адрес обновился
     returnParc, err := store.Get(id)
-		require.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, newAddress, returnParc.Address, "Не совпадает")
 }
 
@@ -107,7 +106,7 @@ func TestSetStatus(t *testing.T) {
 	// настройте подключение к БД
 
 	db, err := sql.Open("sqlite", "tracker.db")
-    	require.NoError(t, err)
+    require.NoError(t, err)
 
     defer db.Close()
 
@@ -141,7 +140,7 @@ func TestGetByClient(t *testing.T) {
 	// prepare
 	// настройте подключение к БД
 	db, err := sql.Open("sqlite", "tracker.db")
-	    require.NoError(t, err)
+	require.NoError(t, err)
 
     defer db.Close() 
 	store := NewParcelStore(db)
